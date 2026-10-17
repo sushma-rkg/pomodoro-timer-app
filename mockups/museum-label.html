@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mockup 3 - Museum Label</title>
+  <style>
+    body { margin: 0; background: #2b1d16; color: #f1e5cf; font-family: Georgia, "Times New Roman", serif; }
+    .page-title { text-align: center; padding: 24px 16px 8px; }
+    .page-title h1 { margin: 0; font-size: 1.2rem; font-weight: normal; letter-spacing: 0.06em; }
+    .page-title p { margin: 6px 0 0; font-size: 0.85rem; color: #b49b80; }
+
+    .view { padding: 32px 16px 44px; border-top: 1px dashed #5b4333; margin-top: 24px; }
+    .view-label { text-align: center; font-size: 0.8rem; letter-spacing: 0.14em; text-transform: uppercase; color: #b49b80; margin-bottom: 22px; }
+
+    .room { max-width: 400px; margin: 0 auto; }
+    .mat { background: #efe4cf; padding: 18px; box-shadow: 0 0 40px rgba(244, 196, 120, 0.18), 0 12px 24px rgba(0, 0, 0, 0.45); }
+    .art-wrap { overflow: hidden; }
+    .art {
+      aspect-ratio: 4 / 5;
+      background:
+        radial-gradient(circle at 72% 22%, #f7d98c 0 10%, transparent 11%),
+        linear-gradient(180deg, #d99069 0%, #a64d3f 48%, #5f7a63 49%, #34493f 100%);
+    }
+    .art.blurred { filter: blur(16px); transform: scale(1.15); }
+    .art.loading { background: #cdbd9f; display: flex; align-items: center; justify-content: center; }
+    .art.loading span { color: #6f5a43; font-style: italic; }
+
+    .plaque { margin-top: 22px; padding: 22px 20px; background: #3b2a20; border: 1px solid #6b5140; border-radius: 16px; text-align: center; }
+    .timer { font-size: 2.3rem; letter-spacing: 0.05em; margin: 0 0 16px; }
+    .timer.muted { color: #8d7861; }
+    .details { margin: 0 0 18px; padding: 12px 0; border-top: 1px solid #6b5140; border-bottom: 1px solid #6b5140; }
+    .details .name { font-style: italic; font-size: 1.3rem; }
+    .details .meta { margin-top: 6px; color: #d3bf9f; }
+    .buttons { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .pill { font: inherit; font-size: 1rem; padding: 12px 28px; border-radius: 999px; border: 2px solid #e6b36a; background: #e6b36a; color: #2b1d16; }
+    .pill.soft { background: transparent; color: #e6b36a; }
+    .pill.faded { opacity: 0.45; }
+
+    /* Laptop: painting in the middle, plaque standing to its right */
+    @media (min-width: 800px) {
+      .room { max-width: 760px; display: flex; gap: 36px; align-items: center; justify-content: center; }
+      .mat { flex: 0 0 380px; }
+      .plaque { flex: 0 0 280px; margin-top: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-title">
+    <h1>Mockup 3: Museum Label</h1>
+    <p>Design only. The buttons and timer do not work.</p>
+  </div>
+
+  <section class="view">
+    <div class="view-label">View 1: Before starting</div>
+    <div class="room">
+      <div class="mat"><div class="art-wrap"><div class="art blurred"></div></div></div>
+      <div class="plaque">
+        <div class="timer">25:00</div>
+        <div class="buttons"><button class="pill">Start</button><button class="pill soft">Reset</button></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="view">
+    <div class="view-label">View 2: Timer running</div>
+    <div class="room">
+      <div class="mat"><div class="art-wrap"><div class="art blurred" style="filter: blur(8px);"></div></div></div>
+      <div class="plaque">
+        <div class="timer">14:32</div>
+        <div class="buttons"><button class="pill">Pause</button><button class="pill soft">Reset</button></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="view">
+    <div class="view-label">View 3: Timer finished</div>
+    <div class="room">
+      <div class="mat"><div class="art-wrap"><div class="art"></div></div></div>
+      <div class="plaque">
+        <div class="timer">00:00</div>
+        <div class="details">
+          <div class="name">Evening by the Water</div>
+          <div class="meta">Anna Example, 1887</div>
+        </div>
+        <div class="buttons"><button class="pill">Restart session</button></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="view">
+    <div class="view-label">Extra: Loading artwork</div>
+    <div class="room">
+      <div class="mat"><div class="art-wrap"><div class="art loading"><span>Loading artwork...</span></div></div></div>
+      <div class="plaque">
+        <div class="timer muted">25:00</div>
+        <div class="buttons"><button class="pill faded">Start</button><button class="pill soft faded">Reset</button></div>
+      </div>
+    </div>
+  </section>
+</body>
+</html>
