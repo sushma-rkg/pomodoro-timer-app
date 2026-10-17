@@ -12,10 +12,8 @@ const MET_API = "https://collectionapi.metmuseum.org/public/collection/";
 const SEARCH_URL = MET_API + "v1.1/search?hasImages=true&departmentId=11&isHighlight=true&q=painting";
 const OBJECT_URL = MET_API + "v1/objects/";
 
-// Made-up text for now. It is only put on the page when the timer finishes.
-const PAINTING = { name: "Evening by the Water", artist: "Anna Example", year: "1887" };
-
 let state = "idle"; // idle, running, paused or finished
+let paintingDetails = null; // name, artist and year of the painting on the page
 let remainingMs = TOTAL_MS;
 let endTime = 0;
 let intervalId = null;
@@ -43,10 +41,12 @@ function preloadImage(url) {
   });
 }
 
-// Picks a random painting that has a photo. Only the small image link is kept,
-// so no painting details are ever on the page before the timer finishes.
+// Picks a random painting that has a photo. The details come from the same
+// answer as the image, so they always belong together. They are kept out of
+// the page until the timer finishes.
 async function loadPainting() {
   const thisLoad = ++latestLoad;
+  paintingDetails = null;
   showArtwork("loading");
   try {
     const search = await getJson(SEARCH_URL);
@@ -58,7 +58,13 @@ async function loadPainting() {
     await preloadImage(imageUrl);
     if (thisLoad !== latestLoad) return;
     paintingEl.src = imageUrl;
+    paintingDetails = {
+      name: painting.title,
+      artist: painting.artistDisplayName,
+      year: painting.objectDate,
+    };
     showArtwork("painting");
+    if (state === "finished") showDetails();
   } catch (error) {
     if (thisLoad === latestLoad) showArtwork("placeholder");
   }
@@ -83,18 +89,29 @@ function tick() {
   }
 }
 
-function showFinished() {
+function showDetails() {
+  if (!paintingDetails) return;
+  const name = (paintingDetails.name || "").trim();
+  const artist = (paintingDetails.artist || "").trim() || "Unknown artist";
+  const year = (paintingDetails.year || "").trim();
+
   const details = document.createElement("div");
   details.className = "details";
-  const name = document.createElement("div");
-  name.className = "name";
-  name.textContent = PAINTING.name;
+  if (name) {
+    const nameEl = document.createElement("div");
+    nameEl.className = "name";
+    nameEl.textContent = name;
+    details.append(nameEl);
+  }
   const meta = document.createElement("div");
   meta.className = "meta";
-  meta.textContent = PAINTING.artist + ", " + PAINTING.year;
-  details.append(name, meta);
+  meta.textContent = year ? artist + ", " + year : artist;
+  details.append(meta);
   detailsSlot.replaceChildren(details);
+}
 
+function showFinished() {
+  showDetails();
   artEl.classList.remove("blurred");
   resetButton.hidden = true;
   mainButton.textContent = "Restart session";
