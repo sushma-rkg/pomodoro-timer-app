@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mockup 2 - Reading Nook</title>
+  <style>
+    body { margin: 0; background: #efe3d0; color: #55382a; font-family: Georgia, "Times New Roman", serif; }
+    .page-title { text-align: center; padding: 24px 16px 8px; }
+    .page-title h1 { margin: 0; font-size: 1.2rem; font-weight: normal; letter-spacing: 0.06em; }
+    .page-title p { margin: 6px 0 0; font-size: 0.85rem; color: #94755f; }
+
+    .view { padding: 28px 16px 40px; }
+    .view-label { text-align: center; font-size: 0.8rem; letter-spacing: 0.14em; text-transform: uppercase; color: #94755f; margin-bottom: 18px; }
+
+    .card { max-width: 420px; margin: 0 auto; background: #fbf5ea; border-radius: 28px; padding: 20px; box-shadow: 0 10px 26px rgba(85, 56, 42, 0.16); }
+    .art-wrap { overflow: hidden; border-radius: 18px; }
+    .art {
+      aspect-ratio: 4 / 5;
+      background:
+        radial-gradient(circle at 28% 26%, #f6d98a 0 10%, transparent 11%),
+        linear-gradient(160deg, #e9a978 0%, #c0683f 50%, #8a9a6f 51%, #53684f 100%);
+    }
+    .art.blurred { filter: blur(16px); transform: scale(1.15); }
+    .art.loading { background: #e6d6bd; display: flex; align-items: center; justify-content: center; }
+    .art.loading span { color: #94755f; font-style: italic; }
+
+    .side { text-align: center; padding-top: 20px; }
+    .timer { font-size: 2.3rem; letter-spacing: 0.05em; margin: 0 0 16px; }
+    .timer.muted { color: #bda78f; }
+    .buttons { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .pill { font: inherit; font-size: 1rem; padding: 12px 28px; border-radius: 999px; border: 2px solid #c0683f; background: #c0683f; color: #fff7ea; }
+    .pill.soft { background: transparent; color: #c0683f; }
+    .pill.faded { opacity: 0.45; }
+
+    .details { margin: 0 0 18px; padding: 14px 16px; border-radius: 18px; background: #f3e4cb; }
+    .details .name { font-style: italic; font-size: 1.3rem; }
+    .details .meta { margin-top: 6px; color: #7a5a47; }
+
+    /* Laptop: painting on the left, everything else on the right */
+    @media (min-width: 800px) {
+      .card { max-width: 860px; display: grid; grid-template-columns: 1fr 1fr; gap: 36px; align-items: center; padding: 28px; }
+      .side { padding-top: 0; }
+      .timer { font-size: 2.8rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-title">
+    <h1>Mockup 2: Reading Nook</h1>
+    <p>Design only. The buttons and timer do not work.</p>
+  </div>
+
+  <section class="view">
+    <div class="view-label">View 1: Before starting</div>
+    <div class="card">
+      <div class="art-wrap"><div class="art blurred"></div></div>
+      <div class="side">
+        <div class="timer">25:00</div>
+        <div class="buttons"><button class="pill">Start</button><button class="pill soft">Reset</button></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="view">
+    <div class="view-label">View 2: Timer running</div>
+    <div class="card">
+      <div class="art-wrap"><div class="art blurred" style="filter: blur(8px);"></div></div>
+      <div class="side">
+        <div class="timer">14:32</div>
+        <div class="buttons"><button class="pill">Pause</button><button class="pill soft">Reset</button></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="view">
+    <div class="view-label">View 3: Timer finished</div>
+    <div class="card">
+      <div class="art-wrap"><div class="art"></div></div>
+      <div class="side">
+        <div class="timer">00:00</div>
+        <div class="details">
+          <div class="name">Evening by the Water</div>
+          <div class="meta">Anna Example, 1887</div>
+        </div>
+        <div class="buttons"><button class="pill">Restart session</button></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="view">
+    <div class="view-label">Extra: Loading artwork</div>
+    <div class="card">
+      <div class="art-wrap"><div class="art loading"><span>Loading artwork...</span></div></div>
+      <div class="side">
+        <div class="timer muted">25:00</div>
+        <div class="buttons"><button class="pill faded">Start</button><button class="pill soft faded">Reset</button></div>
+      </div>
+    </div>
+  </section>
+</body>
+</html>

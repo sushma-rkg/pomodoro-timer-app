@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mockup 1 - Gallery Wall</title>
+  <style>
+    body { margin: 0; background: #f6eedd; color: #4a3426; font-family: Georgia, "Times New Roman", serif; }
+    .page-title { text-align: center; padding: 24px 16px 8px; }
+    .page-title h1 { margin: 0; font-size: 1.2rem; font-weight: normal; letter-spacing: 0.06em; }
+    .page-title p { margin: 6px 0 0; font-size: 0.85rem; color: #8b7355; }
+
+    .view { padding: 32px 16px 48px; border-top: 1px dashed #cdb89a; margin-top: 24px; }
+    .view-label { text-align: center; font-size: 0.8rem; letter-spacing: 0.14em; text-transform: uppercase; color: #8b7355; margin-bottom: 22px; }
+
+    .stage { max-width: 400px; margin: 0 auto; text-align: center; }
+    @media (min-width: 800px) { .stage { max-width: 520px; } }
+
+    .frame { border: 12px solid #a98250; background: #e8dcc3; padding: 14px; box-shadow: 0 14px 28px rgba(74, 52, 38, 0.28); }
+    .art-wrap { overflow: hidden; }
+    .art {
+      aspect-ratio: 4 / 5;
+      background:
+        radial-gradient(circle at 70% 24%, #f4cf75 0 11%, transparent 12%),
+        linear-gradient(180deg, #ecb48a 0%, #cf7f62 46%, #7d9a7b 47%, #46665c 100%);
+    }
+    .art.blurred { filter: blur(16px); transform: scale(1.15); }
+    .art.loading { background: #dccfb4; display: flex; align-items: center; justify-content: center; }
+    .art.loading span { color: #8b7355; font-style: italic; }
+
+    .timer { font-size: 2.6rem; margin: 24px 0 14px; letter-spacing: 0.05em; }
+    .timer.muted { color: #b3a085; }
+    .buttons { display: flex; gap: 12px; justify-content: center; }
+    .pill { font: inherit; font-size: 1rem; padding: 12px 30px; border-radius: 999px; border: 2px solid #8a5a3c; background: #8a5a3c; color: #fbf3e4; }
+    .pill.soft { background: transparent; color: #8a5a3c; }
+    .pill.faded { opacity: 0.45; }
+
+    .label { margin-top: 26px; padding: 16px 18px; border: 1px solid #cdb89a; background: #fbf5ea; text-align: center; }
+    .label .name { font-style: italic; font-size: 1.35rem; }
+    .label .meta { margin-top: 6px; color: #7a6350; }
+  </style>
+</head>
+<body>
+  <div class="page-title">
+    <h1>Mockup 1: Gallery Wall</h1>
+    <p>Design only. The buttons and timer do not work.</p>
+  </div>
+
+  <section class="view">
+    <div class="view-label">View 1: Before starting</div>
+    <div class="stage">
+      <div class="frame"><div class="art-wrap"><div class="art blurred"></div></div></div>
+      <div class="timer">25:00</div>
+      <div class="buttons"><button class="pill">Start</button><button class="pill soft">Reset</button></div>
+    </div>
+  </section>
+
+  <section class="view">
+    <div class="view-label">View 2: Timer running</div>
+    <div class="stage">
+      <div class="frame"><div class="art-wrap"><div class="art blurred" style="filter: blur(8px);"></div></div></div>
+      <div class="timer">14:32</div>
+      <div class="buttons"><button class="pill">Pause</button><button class="pill soft">Reset</button></div>
+    </div>
+  </section>
+
+  <section class="view">
+    <div class="view-label">View 3: Timer finished</div>
+    <div class="stage">
+      <div class="frame"><div class="art-wrap"><div class="art"></div></div></div>
+      <div class="timer">00:00</div>
+      <div class="buttons"><button class="pill">Restart session</button></div>
+      <div class="label">
+        <div class="name">Evening by the Water</div>
+        <div class="meta">Anna Example, 1887</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="view">
+    <div class="view-label">Extra: Loading artwork</div>
+    <div class="stage">
+      <div class="frame"><div class="art-wrap"><div class="art loading"><span>Loading artwork...</span></div></div></div>
+      <div class="timer muted">25:00</div>
+      <div class="buttons"><button class="pill faded">Start</button><button class="pill soft faded">Reset</button></div>
+    </div>
+  </section>
+</body>
+</html>
