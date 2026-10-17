@@ -38,6 +38,29 @@ body {
   transform: scale(1.15);
 }
 
+.art.loading {
+  background: #e6d6bd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.art.loading span {
+  color: #94755f;
+  font-style: italic;
+}
+
+.painting {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+}
+
+[hidden] {
+  display: none !important;
+}
+
 .art.blurred.running {
   filter: blur(8px);
 }
