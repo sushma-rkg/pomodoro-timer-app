@@ -1,4 +1,4 @@
-const TOTAL_MS = 25 * 60 * 1000;
+const TOTAL_MS = 30 * 1000;
 
 const timerEl = document.getElementById("timer");
 const mainButton = document.getElementById("main-button");
