@@ -93,6 +93,19 @@ body {
   color: #7a5a47;
 }
 
+.details .met-link {
+  display: inline-block;
+  margin-top: 10px;
+  font-size: 0.95rem;
+  color: #a4522c;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.details .met-link:hover {
+  color: #7a3a1c;
+}
+
 .buttons {
   display: flex;
   gap: 12px;

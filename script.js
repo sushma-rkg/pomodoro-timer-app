@@ -62,6 +62,7 @@ async function loadPainting() {
       name: painting.title,
       artist: painting.artistDisplayName,
       year: painting.objectDate,
+      link: painting.objectURL,
     };
     showArtwork("painting");
     if (state === "finished") showDetails();
@@ -89,6 +90,16 @@ function tick() {
   }
 }
 
+// Only accepts a page on the Met's own website; anything else counts as blank.
+function metPageUrl(value) {
+  try {
+    const url = new URL((value || "").trim());
+    return url.origin === "https://www.metmuseum.org" ? url.href : "";
+  } catch (error) {
+    return "";
+  }
+}
+
 function showDetails() {
   if (!paintingDetails) return;
   const name = (paintingDetails.name || "").trim();
@@ -107,6 +118,16 @@ function showDetails() {
   meta.className = "meta";
   meta.textContent = year ? artist + ", " + year : artist;
   details.append(meta);
+  const pageUrl = metPageUrl(paintingDetails.link);
+  if (pageUrl) {
+    const link = document.createElement("a");
+    link.className = "met-link";
+    link.href = pageUrl;
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    link.textContent = "View on the Met website";
+    details.append(link);
+  }
   detailsSlot.replaceChildren(details);
 }
 
