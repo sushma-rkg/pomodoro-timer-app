@@ -47,6 +47,7 @@ function preloadImage(url) {
 async function loadPainting() {
   const thisLoad = ++latestLoad;
   paintingDetails = null;
+  paintingEl.classList.remove("revealed");
   showArtwork("loading");
   try {
     const search = await getJson(SEARCH_URL);
@@ -65,7 +66,10 @@ async function loadPainting() {
       link: painting.objectURL,
     };
     showArtwork("painting");
-    if (state === "finished") showDetails();
+    if (state === "finished") {
+      showDetails();
+      paintingEl.classList.add("revealed");
+    }
   } catch (error) {
     if (thisLoad === latestLoad) showArtwork("placeholder");
   }
@@ -133,6 +137,7 @@ function showDetails() {
 
 function showFinished() {
   showDetails();
+  paintingEl.classList.add("revealed");
   artEl.classList.remove("blurred");
   resetButton.hidden = true;
   mainButton.textContent = "Restart session";
@@ -142,7 +147,6 @@ function start() {
   endTime = Date.now() + remainingMs;
   state = "running";
   intervalId = setInterval(tick, 250);
-  artEl.classList.add("running");
   mainButton.textContent = "Pause";
 }
 
@@ -159,7 +163,7 @@ function reset() {
   remainingMs = TOTAL_MS;
   state = "idle";
   render();
-  artEl.classList.remove("running");
+  paintingEl.classList.remove("revealed");
   artEl.classList.add("blurred");
   detailsSlot.replaceChildren();
   resetButton.hidden = false;

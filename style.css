@@ -24,6 +24,7 @@ body {
 .art-wrap {
   overflow: hidden;
   border-radius: 18px;
+  isolation: isolate;
 }
 
 .art {
@@ -55,14 +56,22 @@ body {
   width: 100%;
   aspect-ratio: 4 / 5;
   object-fit: cover;
+  /* Blurred unless "revealed". The picture is enlarged so the frame
+     cuts off the soft edges that a blur creates. */
+  filter: blur(26px);
+  transform: scale(1.4);
+}
+
+/* Only this class fades the blur away (over one second). Taking it off
+   snaps the blur straight back on. */
+.painting.revealed {
+  filter: none;
+  transform: none;
+  transition: filter 1s ease, transform 1s ease;
 }
 
 [hidden] {
   display: none !important;
-}
-
-.art.blurred.running {
-  filter: blur(8px);
 }
 
 .side {
