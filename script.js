@@ -4,6 +4,10 @@ const timerEl = document.getElementById("timer");
 const mainButton = document.getElementById("main-button");
 const resetButton = document.getElementById("reset-button");
 const artEl = document.getElementById("art");
+const detailsSlot = document.getElementById("details-slot");
+
+// Made-up text for now. It is only put on the page when the timer finishes.
+const PAINTING = { name: "Evening by the Water", artist: "Anna Example", year: "1887" };
 
 let state = "idle"; // idle, running, paused or finished
 let remainingMs = TOTAL_MS;
@@ -25,7 +29,25 @@ function tick() {
   if (remainingMs === 0) {
     clearInterval(intervalId);
     state = "finished";
+    showFinished();
   }
+}
+
+function showFinished() {
+  const details = document.createElement("div");
+  details.className = "details";
+  const name = document.createElement("div");
+  name.className = "name";
+  name.textContent = PAINTING.name;
+  const meta = document.createElement("div");
+  meta.className = "meta";
+  meta.textContent = PAINTING.artist + ", " + PAINTING.year;
+  details.append(name, meta);
+  detailsSlot.replaceChildren(details);
+
+  artEl.classList.remove("blurred");
+  resetButton.hidden = true;
+  mainButton.textContent = "Restart session";
 }
 
 function start() {
@@ -50,6 +72,9 @@ function reset() {
   state = "idle";
   render();
   artEl.classList.remove("running");
+  artEl.classList.add("blurred");
+  detailsSlot.replaceChildren();
+  resetButton.hidden = false;
   mainButton.textContent = "Start";
 }
 
@@ -58,6 +83,8 @@ mainButton.addEventListener("click", function () {
     pause();
   } else if (state === "idle" || state === "paused") {
     start();
+  } else if (state === "finished") {
+    reset();
   }
 });
 

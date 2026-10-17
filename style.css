@@ -53,6 +53,23 @@ body {
   margin: 0 0 16px;
 }
 
+.details {
+  margin: 0 0 18px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: #f3e4cb;
+}
+
+.details .name {
+  font-style: italic;
+  font-size: 1.3rem;
+}
+
+.details .meta {
+  margin-top: 6px;
+  color: #7a5a47;
+}
+
 .buttons {
   display: flex;
   gap: 12px;
