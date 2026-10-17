@@ -38,6 +38,10 @@ body {
   transform: scale(1.15);
 }
 
+.art.blurred.running {
+  filter: blur(8px);
+}
+
 .side {
   text-align: center;
   padding-top: 20px;
