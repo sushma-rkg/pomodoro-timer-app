@@ -76,7 +76,8 @@ body {
   margin: 0 0 16px;
 }
 
-.details {
+.details,
+.notice {
   margin: 0 0 18px;
   padding: 14px 16px;
   border-radius: 18px;
@@ -91,6 +92,15 @@ body {
 .details .meta {
   margin-top: 6px;
   color: #7a5a47;
+}
+
+.notice .message {
+  font-style: italic;
+  font-size: 1.15rem;
+}
+
+.notice .retry {
+  margin-top: 12px;
 }
 
 .details .met-link {

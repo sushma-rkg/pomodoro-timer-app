@@ -6,12 +6,18 @@ const resetButton = document.getElementById("reset-button");
 const artEl = document.getElementById("art");
 const artWrapEl = document.querySelector(".art-wrap");
 const detailsSlot = document.getElementById("details-slot");
+const messageSlot = document.getElementById("message-slot");
 const loadingEl = document.getElementById("loading");
 const paintingEl = document.getElementById("painting");
 
 const MET_API = "https://collectionapi.metmuseum.org/public/collection/";
 const SEARCH_URL = MET_API + "v1.1/search?hasImages=true&departmentId=11&isHighlight=true&q=painting";
 const OBJECT_URL = MET_API + "v1/objects/";
+
+const MAX_TRIES = 5; // paintings to try before giving up
+const WAIT_LIMIT_MS = 10 * 1000; // longest wait for the museum or a picture
+const PAUSE_MS = 1000; // pause between tries, so the museum is not flooded
+const BUSY_PAUSE_MS = 2000; // longer pause if the museum says "too many requests"
 
 let state = "idle"; // idle, running, paused or finished
 let paintingDetails = null; // name, artist and year of the painting on the page
@@ -20,6 +26,7 @@ let endTime = 0;
 let intervalId = null;
 let frameId = null;
 let latestLoad = 0;
+let loadController = null; // cancels the tries that are running
 
 // The blur is the share of time left: 1 (strong) at the start, 0 (sharp) at 00:00.
 function blurFraction() {
@@ -44,50 +51,115 @@ function showArtwork(which) {
   paintingEl.hidden = which !== "painting";
 }
 
-async function getJson(url) {
-  const response = await fetch(url);
-  if (!response.ok) throw new Error("Request failed");
-  return response.json();
+// Asks the museum, giving up after WAIT_LIMIT_MS or when the tries are cancelled.
+async function fetchJson(url, cancelSignal) {
+  const request = new AbortController();
+  const timer = setTimeout(function () { request.abort(); }, WAIT_LIMIT_MS);
+  cancelSignal.addEventListener("abort", function () { request.abort(); }, { once: true });
+  try {
+    const response = await fetch(url, { signal: request.signal });
+    if (!response.ok) {
+      const error = new Error("Request failed");
+      error.status = response.status;
+      throw error;
+    }
+    return await response.json();
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 function preloadImage(url) {
   return new Promise(function (resolve, reject) {
     const image = new Image();
-    image.onload = resolve;
-    image.onerror = reject;
+    const timer = setTimeout(function () {
+      image.src = "";
+      reject(new Error("Picture too slow"));
+    }, WAIT_LIMIT_MS);
+    image.onload = function () { clearTimeout(timer); resolve(); };
+    image.onerror = function () { clearTimeout(timer); reject(new Error("Picture failed")); };
     image.src = url;
   });
 }
 
-// Picks a random painting that has a photo. The details come from the same
-// answer as the image, so they always belong together. They are kept out of
-// the page until the timer finishes.
+function sleep(ms) {
+  return new Promise(function (resolve) { setTimeout(resolve, ms); });
+}
+
+// A usable result is a painting with a link to a photo.
+function isUsablePainting(painting) {
+  const kind = (painting.classification || "") + " " + (painting.objectName || "");
+  return /paint/i.test(kind) && Boolean((painting.primaryImageSmall || "").trim());
+}
+
+function showMessage(visible) {
+  if (!visible) {
+    messageSlot.replaceChildren();
+    return;
+  }
+  const box = document.createElement("div");
+  box.className = "notice";
+  const text = document.createElement("div");
+  text.className = "message";
+  text.textContent = "We couldn't load a painting this time.";
+  const retry = document.createElement("button");
+  retry.className = "pill soft retry";
+  retry.type = "button";
+  retry.textContent = "Try again";
+  retry.addEventListener("click", loadPainting);
+  box.append(text, retry);
+  messageSlot.replaceChildren(box);
+}
+
+// Picks a random painting that has a photo, trying up to MAX_TRIES different
+// paintings. The details come from the same answer as the picture, so they
+// always belong together. They are kept out of the page until the timer finishes.
 async function loadPainting() {
   const thisLoad = ++latestLoad;
+  if (loadController) loadController.abort();
+  const controller = new AbortController();
+  loadController = controller;
   paintingDetails = null;
+  showMessage(false);
   showArtwork("loading");
-  try {
-    const search = await getJson(SEARCH_URL);
-    const ids = search.objectIDs;
-    const id = ids[Math.floor(Math.random() * ids.length)];
-    const painting = await getJson(OBJECT_URL + id);
-    const imageUrl = painting.primaryImageSmall;
-    if (!imageUrl) throw new Error("No image");
-    await preloadImage(imageUrl);
-    if (thisLoad !== latestLoad) return;
-    paintingEl.src = imageUrl;
-    paintingDetails = {
-      name: painting.title,
-      artist: painting.artistDisplayName,
-      year: painting.objectDate,
-      link: painting.objectURL,
-    };
-    applyBlur();
-    showArtwork("painting");
-    if (state === "finished") showDetails();
-  } catch (error) {
-    if (thisLoad === latestLoad) showArtwork("placeholder");
+
+  let ids = [];
+  for (let attempt = 1; attempt <= MAX_TRIES; attempt++) {
+    let wait = PAUSE_MS;
+    try {
+      if (ids.length === 0) {
+        const search = await fetchJson(SEARCH_URL, controller.signal);
+        ids = Array.isArray(search.objectIDs) ? search.objectIDs.slice() : [];
+        if (ids.length === 0) throw new Error("Nothing found");
+      }
+      const id = ids.splice(Math.floor(Math.random() * ids.length), 1)[0];
+      const painting = await fetchJson(OBJECT_URL + id, controller.signal);
+      if (!isUsablePainting(painting)) throw new Error("Not a usable painting");
+      const imageUrl = painting.primaryImageSmall.trim();
+      await preloadImage(imageUrl);
+      if (thisLoad !== latestLoad) return;
+      paintingEl.src = imageUrl;
+      paintingDetails = {
+        name: painting.title,
+        artist: painting.artistDisplayName,
+        year: painting.objectDate,
+        link: painting.objectURL,
+      };
+      applyBlur();
+      showArtwork("painting");
+      if (state === "finished") showDetails();
+      return;
+    } catch (error) {
+      if (thisLoad !== latestLoad) return;
+      if (error.status === 403 || error.status === 429) wait = BUSY_PAUSE_MS;
+    }
+    if (attempt < MAX_TRIES) {
+      await sleep(wait);
+      if (thisLoad !== latestLoad) return;
+    }
   }
+  showArtwork("placeholder");
+  showMessage(true);
 }
 
 function render() {
