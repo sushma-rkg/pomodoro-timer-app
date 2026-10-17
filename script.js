@@ -4,6 +4,7 @@ const timerEl = document.getElementById("timer");
 const mainButton = document.getElementById("main-button");
 const resetButton = document.getElementById("reset-button");
 const artEl = document.getElementById("art");
+const artWrapEl = document.querySelector(".art-wrap");
 const detailsSlot = document.getElementById("details-slot");
 const loadingEl = document.getElementById("loading");
 const paintingEl = document.getElementById("painting");
@@ -17,7 +18,24 @@ let paintingDetails = null; // name, artist and year of the painting on the page
 let remainingMs = TOTAL_MS;
 let endTime = 0;
 let intervalId = null;
+let frameId = null;
 let latestLoad = 0;
+
+// The blur is the share of time left: 1 (strong) at the start, 0 (sharp) at 00:00.
+function blurFraction() {
+  const ms = state === "running" ? Math.max(0, endTime - Date.now()) : remainingMs;
+  return ms / TOTAL_MS;
+}
+
+function applyBlur() {
+  artWrapEl.style.setProperty("--p", blurFraction());
+}
+
+// Clears the blur smoothly while the timer runs, working from the clock.
+function animateBlur() {
+  applyBlur();
+  if (state === "running") frameId = requestAnimationFrame(animateBlur);
+}
 
 // Shows one of: "placeholder", "loading" or "painting".
 function showArtwork(which) {
@@ -47,7 +65,6 @@ function preloadImage(url) {
 async function loadPainting() {
   const thisLoad = ++latestLoad;
   paintingDetails = null;
-  paintingEl.classList.remove("revealed");
   showArtwork("loading");
   try {
     const search = await getJson(SEARCH_URL);
@@ -65,11 +82,9 @@ async function loadPainting() {
       year: painting.objectDate,
       link: painting.objectURL,
     };
+    applyBlur();
     showArtwork("painting");
-    if (state === "finished") {
-      showDetails();
-      paintingEl.classList.add("revealed");
-    }
+    if (state === "finished") showDetails();
   } catch (error) {
     if (thisLoad === latestLoad) showArtwork("placeholder");
   }
@@ -92,6 +107,7 @@ function tick() {
     state = "finished";
     showFinished();
   }
+  applyBlur();
 }
 
 // Only accepts a page on the Met's own website; anything else counts as blank.
@@ -137,8 +153,6 @@ function showDetails() {
 
 function showFinished() {
   showDetails();
-  paintingEl.classList.add("revealed");
-  artEl.classList.remove("blurred");
   resetButton.hidden = true;
   mainButton.textContent = "Restart session";
 }
@@ -147,6 +161,8 @@ function start() {
   endTime = Date.now() + remainingMs;
   state = "running";
   intervalId = setInterval(tick, 250);
+  cancelAnimationFrame(frameId);
+  animateBlur();
   mainButton.textContent = "Pause";
 }
 
@@ -154,17 +170,19 @@ function pause() {
   tick();
   if (state !== "running") return;
   clearInterval(intervalId);
+  cancelAnimationFrame(frameId);
   state = "paused";
+  applyBlur();
   mainButton.textContent = "Resume";
 }
 
 function reset() {
   clearInterval(intervalId);
+  cancelAnimationFrame(frameId);
   remainingMs = TOTAL_MS;
   state = "idle";
   render();
-  paintingEl.classList.remove("revealed");
-  artEl.classList.add("blurred");
+  applyBlur();
   detailsSlot.replaceChildren();
   resetButton.hidden = false;
   mainButton.textContent = "Start";
